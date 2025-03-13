@@ -46,11 +46,12 @@ class Webserver
         } else {
 
             /** Create SOAP Server */
-            $url     = $_SERVER['HTTP_HOST'] . '/' . $_SERVER['PHP_SELF'];
+            $url     = $_SERVER['HTTP_HOST']  . $_SERVER['PHP_SELF'];
             $url     = $_SERVER['SERVER_PORT'] == 443 ? 'https://' . $url : 'http://' . $url;
             $options = array(
                 'encoding' => 'UTF-8',
             );
+
             $soapServer = new SoapServer($url . "?wsdl");
             $soapServer->setClass('Montitor', $callback, $this->config);
             $soapServer->handle();
