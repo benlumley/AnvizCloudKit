@@ -1,4 +1,5 @@
 <?php
+namespace Anviz\Cloudkit;
 /**
  * Created by Jacobs<jacobs@anviz.com>.
  * Date: 18-5-7

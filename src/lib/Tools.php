@@ -1,5 +1,5 @@
 <?php
-
+namespace Anviz\Cloudkit\lib;
 /**
  * File Name: Tools.php
  * Created by Jacobs <jacobs@anviz.com>.

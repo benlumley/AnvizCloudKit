@@ -1,5 +1,5 @@
 <?php
-
+namespace Anviz\Cloudkit\lib;
 /**
  * Class SoapDiscovery
  */

@@ -1,5 +1,5 @@
 <?php
-
+namespace Anviz\Cloudkit;
 /**
  * File Name: Webserver.php
  * Created by Jacobs <jacobs@anviz.com>.
