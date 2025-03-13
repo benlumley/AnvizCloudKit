@@ -1,5 +1,7 @@
 <?php
 namespace Anviz\Cloudkit\lib;
+use Anviz\Cloudkit\Exception;
+
 /**
  * Class SoapDiscovery
  */
@@ -38,7 +40,7 @@ class SoapDiscovery
             throw new Exception('No class name.');
         }
 
-        $class = new ReflectionClass($this->class_name);
+        $class = new \ReflectionClass($this->class_name);
 
         if (!$class->isInstantiable()) {
             throw new Exception('Class is not instantiable.');

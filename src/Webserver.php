@@ -1,5 +1,8 @@
 <?php
 namespace Anviz\Cloudkit;
+use Anviz\Cloudkit\lib\Logs;
+use Anviz\Cloudkit\lib\SoapDiscovery;
+
 /**
  * File Name: Webserver.php
  * Created by Jacobs <jacobs@anviz.com>.
@@ -8,14 +11,6 @@ namespace Anviz\Cloudkit;
  * Description:
  */
 
-defined('SRC_DIR') ? '' : define('SRC_DIR', dirname(__FILE__));
-
-require_once SRC_DIR . '/lib/SoapDiscovery.php';
-require_once SRC_DIR . '/lib/Tools.php';
-require_once SRC_DIR . '/lib/Montitor.php';
-require_once SRC_DIR . '/lib/Protocol.php';
-require_once SRC_DIR . '/lib/Logs.php';
-require_once SRC_DIR . '/interface.php';
 
 $log = new Logs(empty($config['logs']) ? '' : $config['logs']);
 
@@ -52,7 +47,7 @@ class Webserver
                 'encoding' => 'UTF-8',
             );
 
-            $soapServer = new SoapServer($url . "?wsdl");
+            $soapServer = new \SoapServer($url . "?wsdl");
             $soapServer->setClass('Montitor', $callback, $this->config);
             $soapServer->handle();
         }

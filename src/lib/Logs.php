@@ -19,7 +19,7 @@ class Logs
         if (!empty($config['path']))
             $this->log_path = $config['path'];
         else
-            $this->log_path = SRC_DIR . DIRECTORY_SEPARATOR . 'logs';
+            $this->log_path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'logs';
     }
 
     /**
