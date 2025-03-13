@@ -1,0 +1,25 @@
+{
+    "name": "anviz/cloudkit",
+    "description": "A description of what your package does",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Anviz Jacobs"
+        },
+        {
+            "name": "Ben Lumley"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Anviz\\Cloudkit\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=8"
+    },
+    "require-dev": {
+
+    }
+}
