@@ -10,6 +10,7 @@ class SoapDiscovery
 
     private $class_name = '';
     private $service_name = '';
+    private $url = '';
 
     /**
      * SoapDiscovery::__construct() SoapDiscovery class Constructor.
@@ -17,10 +18,11 @@ class SoapDiscovery
      * @param string $class_name
      * @param string $service_name
      * */
-    public function __construct ($class_name = '', $service_name = '')
+    public function __construct ($class_name = '', $service_name = '', $url = '')
     {
         $this->class_name = $class_name;
         $this->service_name = $service_name;
+        $this->url = $url;
     }
 
     /**
@@ -50,7 +52,7 @@ class SoapDiscovery
 
         $portTypeWSDL = "\t<wsdl:portType name=\"" . $this->service_name . "PortType\">\n";
         $bindingWSDL = "\t<wsdl:binding name=\"" . $this->service_name . 'Binding" type="tns:' . $this->service_name . "PortType\">\n\t\t<soap:binding style=\"rpc\" transport=\"http://schemas.xmlsoap.org/soap/http\" />\n";
-        $serviceWSDL = "\t<wsdl:service name=\"" . $this->service_name . "Service\">\n\t\t<wsdl:port name=\"" . $this->service_name . 'Port" binding="tns:' . $this->service_name . "Binding\">\n\t\t\t<soap:address location=\"http://" . $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] . $_SERVER['PHP_SELF'] . "\" />\n\t\t</wsdl:port>\n\t</wsdl:service>\n";
+        $serviceWSDL = "\t<wsdl:service name=\"" . $this->service_name . "Service\">\n\t\t<wsdl:port name=\"" . $this->service_name . 'Port" binding="tns:' . $this->service_name . "Binding\">\n\t\t\t<soap:address location=\"". $this->url . "\" />\n\t\t</wsdl:port>\n\t</wsdl:service>\n";
         $messageWSDL = '';
         foreach ($methods as $method) {
             if ($method->isPublic() && !$method->isConstructor()) {

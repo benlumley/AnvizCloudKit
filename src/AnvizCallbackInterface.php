@@ -13,7 +13,7 @@ namespace Anviz\Cloudkit;
  * Interface AnvizInterface
  * The callback class for the device response server instruction
  */
-interface AnvizInterface
+interface AnvizCallbackInterface
 {
     /**
      * @return
