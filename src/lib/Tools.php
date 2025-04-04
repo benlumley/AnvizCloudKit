@@ -122,8 +122,19 @@ class Tools
         // ECB mode does NOT use an IV (so we pass an empty string)
         $iv = "";
 
+        if ((strlen($string) % 8) !== 0) {
+            throw new \Exception("Plaintext must be a multiple of 8 bytes when using NO_PADDING");
+        }
+
         // Encrypt using OpenSSL 3DES in ECB mode
-        return openssl_encrypt($string, 'des-ede3', $key, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING, $iv);
+
+        //        var_dump($string, 'des-ede3', $key, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING, $iv);
+        //        dd([$string, 'des-ede3', $key, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING, $iv]);
+        $encrypted = openssl_encrypt($string, 'des-ede3', $key, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING, $iv);
+        if ($encrypted === false) {
+            throw new \Exception(openssl_error_string());
+        }
+        return $encrypted;
     }
 
     /**

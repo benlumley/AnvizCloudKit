@@ -26,7 +26,7 @@ class Protocol
             return false;
         }
 
-        $sha1 = substr(sha1(KEY . $token), 16, 8);
+        $sha1 = substr(sha1(AnvizConstants::KEY . $token), 16, 8);
 
         $data = base64_decode($data);
 
@@ -928,22 +928,22 @@ class Protocol
 
     public static function showRegister($device_id)
     {
-        return Tools::R(self::joinCommand('11111111', $device_id, '11111111', CMD_REGESTER, 1, ''));
+        return Tools::R(self::joinCommand('11111111', $device_id, '11111111', AnvizConstants::CMD_REGESTER, 1, ''));
     }
 
     public static function showError($sha1, $device_uuid, $command = '')
     {
-        return Tools::R(self::joinCommand($sha1, $device_uuid, '11111111', CMD_ERROR, 5, $command));
+        return Tools::R(self::joinCommand($sha1, $device_uuid, '11111111', AnvizConstants::CMD_ERROR, 5, $command));
     }
 
     public static function showForbidden()
     {
-        return Tools::R(self::joinCommand('11111111', '22222222', '22222222', CMD_FORBIDDEN, 5, ''));
+        return Tools::R(self::joinCommand('11111111', '22222222', '22222222', AnvizConstants::CMD_FORBIDDEN, 5, ''));
     }
 
     public static function showNocommand($token, $device_id)
     {
-        return Protocol::joinCommand($token, $device_id, '11111111', CMD_NOCOMMAND, 5);
+        return Protocol::joinCommand($token, $device_id, '11111111', AnvizConstants::CMD_NOCOMMAND, 5);
     }
 
     /**
@@ -968,9 +968,10 @@ class Protocol
             return false;
         }
 
-        $sha1 = substr(sha1(KEY . $token), 16, 8);
+        $sha1 = substr(sha1(AnvizConstants::KEY . $token), 16, 8);
 
         $id = empty($id) ? '11111111' : str_pad($id, 8, ' ', STR_PAD_LEFT);
+        $content = str_pad($content, 8, '0', STR_PAD_LEFT);
 
         $command = empty($command) ? '0000' : str_pad($command, 4, ' ', STR_PAD_LEFT);
         /** Next heartbeat packet send interval time */
@@ -983,10 +984,10 @@ class Protocol
         $device_id = str_pad($device_id, 32, 0x00, STR_PAD_LEFT);
 
         $string = $device_id . $id . $command . $nextime . $length . $content;
-
+//dump([$device_id, $id, $command, $nextime, $length, $content, $string, $sha1]);
         switch ($command) {
-            case CMD_REGESTER:
-            case CMD_FORBIDDEN:
+            case AnvizConstants::CMD_REGESTER:
+            case AnvizConstants::CMD_FORBIDDEN:
                 return $string;
 
             default:

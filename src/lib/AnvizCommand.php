@@ -30,7 +30,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => array(),
-            'command' => CMD_GETNETWORK,
+            'command' => AnvizConstants::CMD_GETNETWORK,
             'content' => base64_encode($content),
         );
     }
@@ -48,7 +48,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => array(),
-            'command' => CMD_GETRECORDUSERFPCOUNT,
+            'command' => AnvizConstants::CMD_GETRECORDUSERFPCOUNT,
             'content' => base64_encode($content),
         );
     }
@@ -68,7 +68,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => [],
-            'command' => CMD_SETADMINPASSWORD,
+            'command' => AnvizConstants::CMD_SETADMINPASSWORD,
             'content' => base64_encode($content),
         );
     }
@@ -101,7 +101,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => $data,
-            'command' => CMD_SETDATETIME,
+            'command' => AnvizConstants::CMD_SETDATETIME,
             'content' => base64_encode($content),
         );
     }
@@ -133,7 +133,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => $data,
-            'command' => CMD_GETALLEMPLOYEE,
+            'command' => AnvizConstants::CMD_GETALLEMPLOYEE,
             'content' => base64_encode($content),
         );
     }
@@ -164,7 +164,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => $data,
-            'command' => CMD_GETONEEMPLOYEE,
+            'command' => AnvizConstants::CMD_GETONEEMPLOYEE,
             'content' => base64_encode($content),
         );
     }
@@ -218,7 +218,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => array(),
-            'command' => CMD_PUTALLEMPLOYEE,
+            'command' => AnvizConstants::CMD_PUTALLEMPLOYEE,
             'content' => base64_encode($content),
         );
     }
@@ -258,7 +258,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => array(),
-            'command' => CMD_PUTONEEMPLOYEE,
+            'command' => AnvizConstants::CMD_PUTONEEMPLOYEE,
             'content' => base64_encode($content),
         );
     }
@@ -277,7 +277,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => array(),
-            'command' => CMD_DELETEALLEMPLOYEE,
+            'command' => AnvizConstants::CMD_DELETEALLEMPLOYEE,
             'content' => base64_encode($content),
         );
     }
@@ -316,7 +316,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => $data,
-            'command' => CMD_DELETEONEEMPLOYEE,
+            'command' => AnvizConstants::CMD_DELETEONEEMPLOYEE,
             'content' => base64_encode($content),
         );
     }
@@ -348,7 +348,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => $data,
-            'command' => CMD_GETALLFINGER,
+            'command' => AnvizConstants::CMD_GETALLFINGER,
             'content' => base64_encode($content),
         );
     }
@@ -377,7 +377,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => $data,
-            'command' => CMD_GETONEFINGER,
+            'command' => AnvizConstants::CMD_GETONEFINGER,
             'content' => base64_encode($content),
         );
     }
@@ -439,7 +439,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => array(),
-            'command' => CMD_PUTALLFINGER,
+            'command' => AnvizConstants::CMD_PUTALLFINGER,
             'content' => base64_encode($content),
         );
     }
@@ -472,7 +472,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => array(),
-            'command' => CMD_PUTONEFINGER,
+            'command' => AnvizConstants::CMD_PUTONEFINGER,
             'content' => base64_encode($content),
         );
     }
@@ -506,7 +506,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => array(),
-            'command' => CMD_PUTONEFINGER,
+            'command' => AnvizConstants::CMD_PUTONEFINGER,
             'content' => base64_encode($content),
         );
     }
@@ -539,7 +539,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => $data,
-            'command' => CMD_ENROLLFINGER,
+            'command' => AnvizConstants::CMD_ENROLLFINGER,
             'content' => base64_encode($content),
         );
     }
@@ -578,7 +578,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => $data,
-            'command' => CMD_ENROLLFINGER,
+            'command' => AnvizConstants::CMD_ENROLLFINGER,
             'content' => base64_encode($content),
         );
     }
@@ -601,7 +601,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => $data,
-            'command' => CMD_ENROLLCARD,
+            'command' => AnvizConstants::CMD_ENROLLCARD,
             'content' => base64_encode($content),
         );
     }
@@ -619,7 +619,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => array(),
-            'command' => CMD_DELETEALLFINGER,
+            'command' => AnvizConstants::CMD_DELETEALLFINGER,
             'content' => base64_encode($content),
         );
     }
@@ -662,7 +662,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => $data,
-            'command' => CMD_DELETEONEFINGER,
+            'command' => AnvizConstants::CMD_DELETEONEFINGER,
             'content' => base64_encode($content),
         );
     }
@@ -703,7 +703,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => $data,
-            'command' => CMD_GETALLRECORD,
+            'command' => AnvizConstants::CMD_GETALLRECORD,
             'content' => base64_encode($content),
         );
     }
@@ -716,7 +716,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => $data,
-            'command' => CMD_OPENDOOR,
+            'command' => AnvizConstants::CMD_OPENDOOR,
             'content' => '',
         );
     }
@@ -748,7 +748,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => $data,
-            'command' => CMD_GETNEWTEMPRECORD,
+            'command' => AnvizConstants::CMD_GETNEWTEMPRECORD,
             'content' => base64_encode($content),
         );
     }
@@ -777,7 +777,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => $data,
-            'command' => CMD_GETTEMPRECORDPIC,
+            'command' => AnvizConstants::CMD_GETTEMPRECORDPIC,
             'content' => base64_encode($content),
         );
     }
@@ -799,7 +799,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => $data,
-            'command' => CMD_SETMASKTEMP,
+            'command' => AnvizConstants::CMD_SETMASKTEMP,
             'content' => base64_encode($content),
         );
     }
@@ -832,7 +832,7 @@ class AnvizCommand
         return array(
             'id'      => $id,
             'params'  => $data,
-            'command' => CMD_GETNEWRECORD,
+            'command' => AnvizConstants::CMD_GETNEWRECORD,
             'content' => base64_encode($content),
         );
     }

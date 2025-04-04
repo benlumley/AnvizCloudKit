@@ -19,6 +19,7 @@ $config['logs']['path'] = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'logs';
 /**
  * The communication instructions of device
  */
+
 define('KEY', 'AnvizDevelopOpenKey');
 define('CMD_LOGIN', 9001); //Login
 define('CMD_NOCOMMAND', 9002); //Heartbeat
