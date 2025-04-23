@@ -198,9 +198,11 @@ class Montitor
                 break;
 
             default:
+                Log::info('actionTransport default');
                 if (!$this->callback->other($device_id, $data['id'])) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLRECORD);
                 }
+                Log::info('actionTransport default other end');
                 break;
         }
 
@@ -242,13 +244,14 @@ class Montitor
         }
         $data = Protocol::explodeCommand($token, $data);
         if (!$data) {
-            $this->log->write('error', 'actionReport: The token has expires');
+            $this->log->write('error', 'actionReport: No data');
 
             return Protocol::showRegister($device_id);
         }
 
         $this->callback->updateLastlogin($device_id);
 
+        Log::info('actionReport: explodeCommand: Data - ', $data);
         switch ($data['command']) {
             case AnvizConstants::CMD_GETNEWRECORD:
                 $result = Protocol::RecordDevice($data['content']);
@@ -268,24 +271,39 @@ class Montitor
 
             case AnvizConstants::CMD_GETTEMPRECORDPIC:
                 $result = Protocol::TemperaturePic($data['content']);
-                $this->log->write('debug', 'actionTransport: ' . AnvizConstants::CMD_GETTEMPRECORDPIC );
+                $this->log->write('debug', 'actionReport: ' . AnvizConstants::CMD_GETTEMPRECORDPIC );
                 if (!$this->callback->temperaturePic($device_id, $data['id'], $result)) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETNEWTEMPRECORD);
                 }
                 break;
+
+            case AnvizConstants::CMD_PUTONEEMPLOYEE:
+            case AnvizConstants::CMD_PUTALLEMPLOYEE:
+                $result = Protocol::EmployeeDevice($data['content']);
+                $this->log->write('info', 'actionReport: ' . $data['command'] . ' - ' . json_encode($result));
+                if (!$this->callback->employee($device_id, $data['id'], $result)) {
+                    return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLEMPLOYEE);
+                }
+                break;
+
             default:
+                Log::info('actionReport default');
                 if (!$this->callback->other($device_id, $data['id'])) {
+                    Log::info('actionReport default other');
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLRECORD);
                 }
+                Log::info('actionReport default other end');
                 break;
         }
 
+        Log::info('actionReport: Get Next Command');
         /** Get the next command **/
         $data = $this->callback->getNextCommand($device_id);
         if (empty($data)) {
+            $this->log->write('debug', 'actionReport: No next command');
             $command = Protocol::showNocommand($token, $device_id);
         } else {
-            $this->log->write('debug', 'actionTransport: Response:' . json_encode($data));
+            $this->log->write('debug', 'actionReport: Response:' . json_encode($data));
             $command = Protocol::joinCommand($token, $device_id, $data['id'], $data['command'], 0, $data['content']);
         }
 

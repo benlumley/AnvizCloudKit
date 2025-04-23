@@ -1,5 +1,7 @@
 <?php
 namespace Anviz\Cloudkit\lib;
+use Illuminate\Support\Facades\Config;
+
 /**
  * File Name: Protocol.php
  * Created by Jacobs <jacobs@anviz.com>.
@@ -26,7 +28,7 @@ class Protocol
             return false;
         }
 
-        $sha1 = substr(sha1(AnvizConstants::KEY . $token), 16, 8);
+        $sha1 = substr(sha1(Config::get('app.anviz.key') . $token), 16, 8);
 
         $data = base64_decode($data);
 
@@ -197,9 +199,11 @@ class Protocol
             /** Last Name */
             $record['name'] = '';
             for ($_i = 0; $_i < 10; $_i++) {
-                $temp = (ord($row[$_i * 2 + 13]) << 8) + ord($row[$_i * 2 + 12]);
-                if (empty($temp)) {
-                    continue;
+//                $temp = (ord($row[$_i * 2 + 13]) << 8) + ord($row[$_i * 2 + 12]);
+                $temp = (ord($row[$_i * 2 + 12]) << 0) + (ord($row[$_i * 2 + 13]) << 8);
+
+                if ($temp === 0) {
+                    break;
                 }
                 $record['name'] .= Tools::uni2utf8($temp);
             }
@@ -435,9 +439,9 @@ class Protocol
             $record['checktime'] = (ord($row[5]) << 24) + (ord($row[6]) << 16) + (ord($row[7]) << 8) + ord($row[8]);
             $record['checktime'] = $record['checktime'] + strtotime('2000-01-02 00:00:00');
             /** Check Type */
-            //$record['checktype'] = ord($row[9]);
+            $record['checktype'] = ord($row[9]);
             /** Work Type */
-            //$record['worktype'] = ord($row[10]);
+            $record['worktype'] = ord($row[10]);
 
             $result[$i] = $record;
         }
@@ -968,7 +972,7 @@ class Protocol
             return false;
         }
 
-        $sha1 = substr(sha1(AnvizConstants::KEY . $token), 16, 8);
+        $sha1 = substr(sha1(Config::get('app.anviz.key') . $token), 16, 8);
 
         $id = empty($id) ? '11111111' : str_pad($id, 8, ' ', STR_PAD_LEFT);
         $content = str_pad($content, 8, '0', STR_PAD_LEFT);
