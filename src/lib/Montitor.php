@@ -61,6 +61,7 @@ class Montitor
         $this->log->write('info', 'actionRegister: Device Info:' . json_encode($device));
 
         /** Return to let device to login system */
+        $this->log->write('info', 'actionRegister: Device ID:' . $id);
         $command = Protocol::joinCommand($token, $id, '11111111', AnvizConstants::CMD_LOGIN, 0, $id);
 
         $this->log->write('info', 'actionRegister: Command:', [bin2hex($command)]);
@@ -77,9 +78,7 @@ class Montitor
     public function actionTransport($serial_number = "", $data = "")
     {
         $device_id = $serial_number;
-        Log::info('actionTransport: :' . $device_id);
         $this->log->write('info', 'actionTransport: :' . $device_id);
-        $this->log->write('info', 'actionTransport: DATA:' . $data);
 
         if (empty($device_id) || empty($data)) {
             $this->log->write('error', 'actionTransport: The lack of necessary parameters');
@@ -94,7 +93,9 @@ class Montitor
             $this->log->write('error', 'actionTransport: The token has expires');
             return Protocol::showRegister($device_id);
         }
+        $this->log->write('info', 'pre-get-token');
         $data = Protocol::explodeCommand($token, $data);
+        $this->log->write('info', 'post get token');
         if (!$data) {
             $this->log->write('error', 'actionTransport: The token has expires');
 
@@ -104,6 +105,8 @@ class Montitor
         $this->callback->updateLastlogin($device_id);
 
         $this->log->write('info', 'explodeCommand: Data-'.json_encode($data));
+        $command = $data['command'];
+        $this->log->write('info', 'actionTransport: Command:' . AnvizConstants::getCommandName($command));
         switch ($data['command']) {
             case AnvizConstants::CMD_REGESTER:
                 return Protocol::showRegister($device_id);
@@ -198,11 +201,10 @@ class Montitor
                 break;
 
             default:
-                Log::info('actionTransport default');
+                $this->log->info('actionTransport default');
                 if (!$this->callback->other($device_id, $data['id'])) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLRECORD);
                 }
-                Log::info('actionTransport default other end');
                 break;
         }
 
@@ -251,7 +253,7 @@ class Montitor
 
         $this->callback->updateLastlogin($device_id);
 
-        Log::info('actionReport: explodeCommand: Data - ', $data);
+        $this->log->info('actionReport: explodeCommand: Data - ', $data);
         switch ($data['command']) {
             case AnvizConstants::CMD_GETNEWRECORD:
                 $result = Protocol::RecordDevice($data['content']);
@@ -279,24 +281,28 @@ class Montitor
 
             case AnvizConstants::CMD_PUTONEEMPLOYEE:
             case AnvizConstants::CMD_PUTALLEMPLOYEE:
+
+                /*
+                // this is troublesome - i added it; wasn't in cloudkit originally; doesn't reliably decrypt - passwords are always corrupt and sometimes so are names
                 $result = Protocol::EmployeeDevice($data['content']);
                 $this->log->write('info', 'actionReport: ' . $data['command'] . ' - ' . json_encode($result));
                 if (!$this->callback->employee($device_id, $data['id'], $result)) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLEMPLOYEE);
                 }
+                */
                 break;
 
             default:
-                Log::info('actionReport default');
+                $this->log->info('actionReport default');
                 if (!$this->callback->other($device_id, $data['id'])) {
-                    Log::info('actionReport default other');
+                    $this->log->info('actionReport default other');
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLRECORD);
                 }
-                Log::info('actionReport default other end');
+                $this->log->info('actionReport default other end');
                 break;
         }
 
-        Log::info('actionReport: Get Next Command');
+        $this->log->info('actionReport: Get Next Command');
         /** Get the next command **/
         $data = $this->callback->getNextCommand($device_id);
         if (empty($data)) {
@@ -313,6 +319,6 @@ class Montitor
 
     public function __call($name, $arguments)
     {
-        Log::warning("SOAP tried to call missing method: $name", ['args' => $arguments]);
+        $this->log->warning("SOAP tried to call missing method: $name", ['args' => $arguments]);
     }
 }

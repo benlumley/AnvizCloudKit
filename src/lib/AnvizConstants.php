@@ -51,4 +51,20 @@ class AnvizConstants
 
     // Access Control
     public const CMD_OPENDOOR = 4003;                   // Open door
+
+    public static function getCommandName(int $value): ?string
+    {
+        foreach (self::getConstants() as $name => $val) {
+            if ($val === $value) {
+                return $name;
+            }
+        }
+        return null;
+    }
+
+    protected static function getConstants(): array
+    {
+        $ref = new \ReflectionClass(static::class);
+        return $ref->getConstants();
+    }
 }

@@ -62,101 +62,49 @@ class Tools
         return $id;
     }
 
-//    /**
-//     * @Created by Jacobs <jacobs@anviz.com>
-//     * @Name: encrypt3DES
-//     * @param $string
-//     * @param $key
-//     * @return bool|string
-//     * @Description:
-//     */
-//    public static function encrypt3DES($string, $key)
-//    {
-//        if (empty($key))
-//            return false;
-//
-//        $key = str_pad($key, 24, "\0", STR_PAD_RIGHT);
-//
-//        $cipher_alg = MCRYPT_TRIPLEDES;
-//        $iv = mcrypt_create_iv(mcrypt_get_iv_size($cipher_alg, MCRYPT_MODE_ECB), MCRYPT_RAND);
-//        $encrypted_string = mcrypt_encrypt($cipher_alg, $key, $string, MCRYPT_MODE_ECB, $iv);
-//
-//        return $encrypted_string;
-//
-//    }
-//
-//    /**
-//     * @Created by Jacobs <jacobs@anviz.com>
-//     * @Name: decrypt3DES
-//     * @param $string
-//     * @param $key
-//     * @return bool|string
-//     * @Description:
-//     */
-//    public static function decrypt3DES($string, $key)
-//    {
-//        if (empty($key))
-//            return false;
-//
-//        $key = str_pad($key, 24, "\0", STR_PAD_RIGHT);
-//
-//        $cipher_alg = MCRYPT_TRIPLEDES;
-//        $iv = mcrypt_create_iv(mcrypt_get_iv_size($cipher_alg, MCRYPT_MODE_ECB), MCRYPT_RAND);
-//        $decrypted_string = mcrypt_decrypt($cipher_alg, $key, $string, MCRYPT_MODE_ECB, $iv);
-//        return trim($decrypted_string);
-//    }
-
     /**
-     * Encrypts a string using 3DES (Triple DES) in ECB mode.
-     * Fully replicates mcrypt_encrypt() behavior.
+     * @Created by Jacobs <jacobs@anviz.com>
+     * @Name: encrypt3DES
+     * @param $string
+     * @param $key
+     * @return bool|string
+     * @Description:
      */
     public static function encrypt3DES($string, $key)
     {
-        if (empty($key)) {
+        if (empty($key))
             return false;
-        }
 
-        // Ensure the key is exactly 24 bytes (same as mcrypt)
         $key = str_pad($key, 24, "\0", STR_PAD_RIGHT);
 
-        // ECB mode does NOT use an IV (so we pass an empty string)
-        $iv = "";
+        $cipher_alg = MCRYPT_TRIPLEDES;
+        $iv = mcrypt_create_iv(mcrypt_get_iv_size($cipher_alg, MCRYPT_MODE_ECB), MCRYPT_RAND);
+        $encrypted_string = mcrypt_encrypt($cipher_alg, $key, $string, MCRYPT_MODE_ECB, $iv);
 
-        if ((strlen($string) % 8) !== 0) {
-            throw new \Exception("Plaintext must be a multiple of 8 bytes when using NO_PADDING");
-        }
+        return $encrypted_string;
 
-        // Encrypt using OpenSSL 3DES in ECB mode
-
-        //        var_dump($string, 'des-ede3', $key, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING, $iv);
-        //        dd([$string, 'des-ede3', $key, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING, $iv]);
-        $encrypted = openssl_encrypt($string, 'des-ede3', $key, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING, $iv);
-        if ($encrypted === false) {
-            throw new \Exception(openssl_error_string());
-        }
-        return $encrypted;
     }
 
     /**
-     * Decrypts a 3DES (Triple DES) ECB-encrypted string.
-     * Fully replicates mcrypt_decrypt() behavior.
+     * @Created by Jacobs <jacobs@anviz.com>
+     * @Name: decrypt3DES
+     * @param $string
+     * @param $key
+     * @return bool|string
+     * @Description:
      */
-    public static function decrypt3DES($encrypted_string, $key)
+    public static function decrypt3DES($string, $key)
     {
-        if (empty($key)) {
+        if (empty($key))
             return false;
-        }
 
-        // Ensure the key is exactly 24 bytes (same as mcrypt)
         $key = str_pad($key, 24, "\0", STR_PAD_RIGHT);
 
-        // ECB mode does NOT use an IV (so we pass an empty string)
-        $iv = "";
-
-        // Decrypt using OpenSSL 3DES in ECB mode
-        return openssl_decrypt($encrypted_string, 'des-ede3', $key, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING, $iv);
+        $cipher_alg = MCRYPT_TRIPLEDES;
+        $iv = mcrypt_create_iv(mcrypt_get_iv_size($cipher_alg, MCRYPT_MODE_ECB), MCRYPT_RAND);
+        $decrypted_string = mcrypt_decrypt($cipher_alg, $key, $string, MCRYPT_MODE_ECB, $iv);
+        return trim($decrypted_string);
     }
-
 
     /**
      * @Created by Jacobs <jacobs@anviz.com>

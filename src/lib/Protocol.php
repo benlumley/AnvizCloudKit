@@ -199,11 +199,9 @@ class Protocol
             /** Last Name */
             $record['name'] = '';
             for ($_i = 0; $_i < 10; $_i++) {
-//                $temp = (ord($row[$_i * 2 + 13]) << 8) + ord($row[$_i * 2 + 12]);
-                $temp = (ord($row[$_i * 2 + 12]) << 0) + (ord($row[$_i * 2 + 13]) << 8);
-
-                if ($temp === 0) {
-                    break;
+                $temp = (ord($row[$_i * 2 + 13]) << 8) + ord($row[$_i * 2 + 12]);
+                if (empty($temp)) {
+                    continue;
                 }
                 $record['name'] .= Tools::uni2utf8($temp);
             }
@@ -498,7 +496,7 @@ class Protocol
             /** Temperature */
             $record['mask'] = ord($row[20]);
             /** Check Type */
-//            $record['checktype'] = ord($row[21]);
+            $record['checktype'] = ord($row[21]);
 
             $result[$i] = $record;
         }
@@ -975,7 +973,6 @@ class Protocol
         $sha1 = substr(sha1(Config::get('app.anviz.key') . $token), 16, 8);
 
         $id = empty($id) ? '11111111' : str_pad($id, 8, ' ', STR_PAD_LEFT);
-        $content = str_pad($content, 8, '0', STR_PAD_LEFT);
 
         $command = empty($command) ? '0000' : str_pad($command, 4, ' ', STR_PAD_LEFT);
         /** Next heartbeat packet send interval time */
@@ -988,7 +985,7 @@ class Protocol
         $device_id = str_pad($device_id, 32, 0x00, STR_PAD_LEFT);
 
         $string = $device_id . $id . $command . $nextime . $length . $content;
-//dump([$device_id, $id, $command, $nextime, $length, $content, $string, $sha1]);
+
         switch ($command) {
             case AnvizConstants::CMD_REGESTER:
             case AnvizConstants::CMD_FORBIDDEN:
