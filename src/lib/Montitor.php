@@ -200,6 +200,13 @@ class Montitor
                 }
                 break;
 
+            case AnvizConstants::CMD_ERROR:
+                $this->log->write('error', 'actionTransport: The command error');
+                $this->log->write('error', 'actionTransport: Data - ' . json_encode($data));
+                if (!$this->callback->other($device_id, $data['id'])) {
+                    return Protocol::showError($token, $device_id, AnvizConstants::CMD_ERROR);
+                }
+
             default:
                 $this->log->info('actionTransport default');
                 if (!$this->callback->other($device_id, $data['id'])) {
@@ -282,14 +289,14 @@ class Montitor
             case AnvizConstants::CMD_PUTONEEMPLOYEE:
             case AnvizConstants::CMD_PUTALLEMPLOYEE:
 
-                /*
+
                 // this is troublesome - i added it; wasn't in cloudkit originally; doesn't reliably decrypt - passwords are always corrupt and sometimes so are names
                 $result = Protocol::EmployeeDevice($data['content']);
                 $this->log->write('info', 'actionReport: ' . $data['command'] . ' - ' . json_encode($result));
-                if (!$this->callback->employee($device_id, $data['id'], $result)) {
+                if (!$this->callback->queueEmployee($device_id, $data['id'], $result)) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLEMPLOYEE);
                 }
-                */
+
                 break;
 
             default:
