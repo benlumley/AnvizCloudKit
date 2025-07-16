@@ -311,7 +311,8 @@ class Montitor
 
         $this->log->info('actionReport: Get Next Command');
         /** Get the next command **/
-        $data = $this->callback->getNextCommand($device_id);
+//        $data = $this->callback->getNextCommand($device_id);
+        $data = '';
         if (empty($data)) {
             $this->log->write('debug', 'actionReport: No next command');
             $command = Protocol::showNocommand($token, $device_id);
