@@ -33,6 +33,11 @@ class Protocol
         $data = base64_decode($data);
 
         $data                = Tools::decrypt3DES($data, $sha1);
+
+        if (strlen($data) < 56) {
+            return false;
+        }
+
         $result["device_id"] = trim(substr($data, 0, 32));
         $result["id"]        = trim(substr($data, 32, 8));
         $result["command"]   = trim(substr($data, 40, 4));
@@ -108,6 +113,10 @@ class Protocol
     {
         if (empty($content)) {
             return false;
+        }
+
+        if (strlen($content) < 28) {
+            return [];
         }
 
         $result              = array();
@@ -285,6 +294,10 @@ class Protocol
      */
     public static function FaceDevice($content = '',$trans_photo = false)
     {
+        if (strlen($content) < 6) {
+            return [];
+        }
+
         $record = array();
         /** ID On Device */
         $record['idd'] = (ord($content[0]) << 32) + (ord($content[1]) << 24) + (ord($content[2]) << 16) + (ord($content[3]) << 8) + ord($content[4]);
@@ -997,6 +1010,10 @@ class Protocol
     }
 
     public static function dataIsFace($content=''){
+        if (strlen($content) < 6) {
+            return false;
+        }
+
         /**
          * If temp_id = 20,the device is face type.(0~9 means finger type)
          */
