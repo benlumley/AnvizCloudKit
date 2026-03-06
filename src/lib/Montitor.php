@@ -62,7 +62,7 @@ class Montitor
 
         /** Return to let device to login system */
         $this->log->write('info', 'actionRegister: Device ID:' . $id);
-        $command = Protocol::joinCommand($token, $id, '11111111', AnvizConstants::CMD_LOGIN, 60, $id);
+        $command = Protocol::joinCommand($token, $id, '11111111', AnvizConstants::CMD_LOGIN, 10, $id);
 
         $this->log->write('info', 'actionRegister: Command:', [bin2hex($command)]);
         return Tools::R($token . $command);
@@ -221,7 +221,7 @@ class Montitor
             $command = Protocol::showNocommand($token, $device_id);
         } else {
             $this->log->write('debug', 'Next Command: Data:' . json_encode($data));
-            $command = Protocol::joinCommand($token, $device_id, $data['id'], $data['command'], 60, $data['content']);
+            $command = Protocol::joinCommand($token, $device_id, $data['id'], $data['command'], 10, $data['content']);
         }
 
         return Tools::R($command);
@@ -318,7 +318,7 @@ class Montitor
             $command = Protocol::showNocommand($token, $device_id);
         } else {
             $this->log->write('debug', 'actionReport: Response:' . json_encode($data));
-            $command = Protocol::joinCommand($token, $device_id, $data['id'], $data['command'], 60, $data['content']);
+            $command = Protocol::joinCommand($token, $device_id, $data['id'], $data['command'], 10, $data['content']);
         }
 
         return Tools::R($command);

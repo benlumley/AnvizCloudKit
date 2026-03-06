@@ -989,7 +989,7 @@ class Protocol
 
         $command = empty($command) ? '0000' : str_pad($command, 4, ' ', STR_PAD_LEFT);
         /** Next heartbeat packet send interval time */
-        /** eg.（0，5，10，60，300）*/
+        /** gSOAP requires value between 1 and 10 */
         $nextime = empty($command) ? '0005' : str_pad($nexttime, 4, 0, STR_PAD_LEFT);
 
         $length = strlen($content);
