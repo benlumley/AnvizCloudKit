@@ -943,22 +943,22 @@ class Protocol
 
     public static function showRegister($device_id)
     {
-        return Tools::R(self::joinCommand('11111111', $device_id, '11111111', AnvizConstants::CMD_REGESTER, 1, ''));
+        return Tools::R(self::joinCommand('11111111', $device_id, '11111111', AnvizConstants::CMD_REGESTER, 10, ''));
     }
 
     public static function showError($sha1, $device_uuid, $command = '')
     {
-        return Tools::R(self::joinCommand($sha1, $device_uuid, '11111111', AnvizConstants::CMD_ERROR, 5, $command));
+        return Tools::R(self::joinCommand($sha1, $device_uuid, '11111111', AnvizConstants::CMD_ERROR, 10, $command));
     }
 
     public static function showForbidden()
     {
-        return Tools::R(self::joinCommand('11111111', '22222222', '22222222', AnvizConstants::CMD_FORBIDDEN, 5, ''));
+        return Tools::R(self::joinCommand('11111111', '22222222', '22222222', AnvizConstants::CMD_FORBIDDEN, 10, ''));
     }
 
     public static function showNocommand($token, $device_id)
     {
-        return Protocol::joinCommand($token, $device_id, '11111111', AnvizConstants::CMD_NOCOMMAND, 5);
+        return Protocol::joinCommand($token, $device_id, '11111111', AnvizConstants::CMD_NOCOMMAND, 10);
     }
 
     /**
