@@ -103,7 +103,11 @@ class Tools
         $cipher_alg = MCRYPT_TRIPLEDES;
         $iv = mcrypt_create_iv(mcrypt_get_iv_size($cipher_alg, MCRYPT_MODE_ECB), MCRYPT_RAND);
         $decrypted_string = mcrypt_decrypt($cipher_alg, $key, $string, MCRYPT_MODE_ECB, $iv);
-        return trim($decrypted_string);
+
+        // Strip only trailing null bytes (3DES ECB block padding).
+        // The old trim() destroyed binary data by also stripping spaces,
+        // tabs, and newlines that may be legitimate payload bytes.
+        return rtrim($decrypted_string, "\0");
     }
 
     /**

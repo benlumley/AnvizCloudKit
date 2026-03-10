@@ -235,6 +235,98 @@ class Protocol
     }
 
     /**
+     * Parse employee data pushed FROM the device (CMD_PUTONEEMPLOYEE / CMD_PUTALLEMPLOYEE).
+     *
+     * The firmware's CC_GetNewUser packs records differently from the cloud
+     * protocol used by DB_User::getUserAll (which EmployeeDevice expects):
+     *  - Password bytes are raw 3-byte big-endian values (no length nibble).
+     *  - Name field may contain UTF-8 bytes instead of UTF-16LE code-units.
+     *
+     * Because the data is unreliable, this method extracts only the IDD
+     * (which is always correctly encoded) and logs the raw hex for debugging.
+     * Callers should use the IDD to queue a person/findSingle task to
+     * re-fetch authoritative data from the device.
+     *
+     * @param string $content
+     * @return array|bool
+     */
+    public static function EmployeeDeviceRaw($content = '')
+    {
+        if (empty($content)) {
+            return false;
+        }
+
+        // Records are still 40 bytes each
+        if (strlen($content) % 40 != 0) {
+            return false;
+        }
+
+        $result = array();
+        $count = strlen($content) / 40;
+
+        for ($i = 0; $i < $count; $i++) {
+            $row = substr($content, $i * 40, 40);
+
+            $record = array();
+
+            // IDD: 5 bytes big-endian — always reliable
+            $record['idd'] = (ord($row[0]) << 32) + (ord($row[1]) << 24) + (ord($row[2]) << 16) + (ord($row[3]) << 8) + ord($row[4]);
+
+            // Raw hex for debugging
+            $record['raw_hex'] = bin2hex($row);
+
+            // Best-effort name extraction: try UTF-16LE first, fall back to
+            // treating the 20-byte field as UTF-8 if UTF-16LE yields nothing
+            $nameField = substr($row, 12, 20);
+            $name = '';
+
+            // Try UTF-16LE (standard cloud protocol encoding)
+            for ($_i = 0; $_i < 10; $_i++) {
+                $temp = (ord($nameField[$_i * 2 + 1]) << 8) + ord($nameField[$_i * 2]);
+                if (empty($temp)) {
+                    continue;
+                }
+                $name .= Tools::uni2utf8($temp);
+            }
+
+            // If UTF-16LE produced nothing useful, try raw UTF-8
+            if (empty($name)) {
+                $name = rtrim($nameField, "\0");
+                // Validate it's actually UTF-8
+                if (!mb_check_encoding($name, 'UTF-8')) {
+                    $name = '';
+                }
+            }
+
+            $record['name'] = empty($name) ? (string) $record['idd'] : $name;
+
+            // Best-effort password — may be corrupt from firmware encoding mismatch
+            if (ord($row[5]) == 0xFF && ord($row[6]) == 0xFF && ord($row[7]) == 0xFF) {
+                $record['passd'] = '';
+            } else {
+                // Raw 3-byte big-endian value (firmware does NOT use the packed
+                // length-nibble format that the cloud protocol uses)
+                $raw = (ord($row[5]) << 16) + (ord($row[6]) << 8) + ord($row[7]);
+                $record['passd'] = (string) $raw;
+            }
+
+            // Card number
+            if (ord($row[8]) == 0xFF && ord($row[9]) == 0xFF && ord($row[10]) == 0xFF && ord($row[11]) == 0xFF) {
+                $record['cardid'] = '';
+            } else {
+                $record['cardid'] = (ord($row[8]) << 24) + (ord($row[9]) << 16) + (ord($row[10]) << 8) + ord($row[11]);
+            }
+
+            // Group ID
+            $record['group_id'] = ord($row[33]);
+
+            $result[$i] = $record;
+        }
+
+        return $result;
+    }
+
+    /**
      * @Created    by Jacobs <jacobs@anviz.com>
      * @Name       : FingerDevice
      *

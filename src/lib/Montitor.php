@@ -200,6 +200,15 @@ class Montitor
                 }
                 break;
 
+            case AnvizConstants::CMD_PUTONEEMPLOYEE:
+            case AnvizConstants::CMD_PUTALLEMPLOYEE:
+                $result = Protocol::EmployeeDeviceRaw($data['content']);
+                $this->log->write('info', 'actionTransport: ' . $data['command'] . ' - ' . json_encode($result));
+                if (!$this->callback->queueEmployee($device_id, $data['id'], $result ?: [])) {
+                    return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLEMPLOYEE);
+                }
+                break;
+
             case AnvizConstants::CMD_ERROR:
                 $this->log->write('error', 'actionTransport: The command error');
                 $this->log->write('error', 'actionTransport: Data - ' . json_encode($data));
@@ -288,15 +297,11 @@ class Montitor
 
             case AnvizConstants::CMD_PUTONEEMPLOYEE:
             case AnvizConstants::CMD_PUTALLEMPLOYEE:
-
-
-                // this is troublesome - i added it; wasn't in cloudkit originally; doesn't reliably decrypt - passwords are always corrupt and sometimes so are names
-                $result = Protocol::EmployeeDevice($data['content']);
+                $result = Protocol::EmployeeDeviceRaw($data['content']);
                 $this->log->write('info', 'actionReport: ' . $data['command'] . ' - ' . json_encode($result));
-                if (!$this->callback->queueEmployee($device_id, $data['id'], $result)) {
+                if (!$this->callback->queueEmployee($device_id, $data['id'], $result ?: [])) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLEMPLOYEE);
                 }
-
                 break;
 
             default:
