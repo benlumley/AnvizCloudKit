@@ -746,24 +746,29 @@ class Protocol
         $pack = pack("C", intval($idd / 0x00FFFFFFFF)) . pack("N", $idd & 0x00FFFFFFFF);
 
         //密码：5~7
-        if (empty($passd)) {
+        if ($passd === '' || $passd === null) {
+            $pack .= substr(pack('N', 0xFF), 0, 3);
+        } elseif (!is_numeric($passd) || intval($passd) < 0 || intval($passd) > 999999) {
+            // Non-numeric or out-of-range passwords cannot be encoded in the 20-bit format;
+            // treat as "no password" rather than silently encoding garbage
             $pack .= substr(pack('N', 0xFF), 0, 3);
         } else {
-            $length = strlen($passd) << 4;
+            $passd = intval($passd);
+            $length = strlen((string) $passd) << 4;
             $length = intval($length) + intval($passd >> 16);
             $pack .= substr(pack('n', $length), 1, 1) . substr(pack('N', $passd), 2, 2);
         }
 
         //Cardid
-        if (empty($cardid)) {
+        if ($cardid === '' || $cardid === null || $cardid === false) {
             $pack .= pack('N', 0xFFFFFFFF);
         } else {
             $pack .= pack('N', $cardid);
         }
 
         //Name
-        if (strlen($name) > 10) {
-            $name = substr($name, 0, 10);
+        if (mb_strlen($name) > 10) {
+            $name = mb_substr($name, 0, 10);
         }
         $pack .= str_pad(Tools::utf82uni($name), 20, pack('v', 0x00), STR_PAD_RIGHT);
 
@@ -1079,10 +1084,10 @@ class Protocol
 
         $id = empty($id) ? '11111111' : str_pad($id, 8, ' ', STR_PAD_LEFT);
 
-        $command = empty($command) ? '0000' : str_pad($command, 4, ' ', STR_PAD_LEFT);
+        $command = str_pad($command, 4, ' ', STR_PAD_LEFT);
         /** Next heartbeat packet send interval time */
         /** gSOAP nexttime interval in seconds */
-        $nextime = empty($command) ? '0005' : str_pad($nexttime, 4, 0, STR_PAD_LEFT);
+        $nextime = str_pad($nexttime, 4, 0, STR_PAD_LEFT);
 
         $length = strlen($content);
         $length = str_pad($length, 8, 0x00, STR_PAD_LEFT);
