@@ -943,22 +943,22 @@ class Protocol
 
     public static function showRegister($device_id)
     {
-        return Tools::R(self::joinCommand('11111111', $device_id, '11111111', AnvizConstants::CMD_REGESTER, 10, ''));
+        return Tools::R(self::joinCommand('11111111', $device_id, '11111111', AnvizConstants::CMD_REGESTER, 60, ''));
     }
 
     public static function showError($sha1, $device_uuid, $command = '')
     {
-        return Tools::R(self::joinCommand($sha1, $device_uuid, '11111111', AnvizConstants::CMD_ERROR, 10, $command));
+        return Tools::R(self::joinCommand($sha1, $device_uuid, '11111111', AnvizConstants::CMD_ERROR, 60, $command));
     }
 
     public static function showForbidden()
     {
-        return Tools::R(self::joinCommand('11111111', '22222222', '22222222', AnvizConstants::CMD_FORBIDDEN, 10, ''));
+        return Tools::R(self::joinCommand('11111111', '22222222', '22222222', AnvizConstants::CMD_FORBIDDEN, 60, ''));
     }
 
     public static function showNocommand($token, $device_id)
     {
-        return Protocol::joinCommand($token, $device_id, '11111111', AnvizConstants::CMD_NOCOMMAND, 10);
+        return Protocol::joinCommand($token, $device_id, '11111111', AnvizConstants::CMD_NOCOMMAND, 60);
     }
 
     /**
@@ -989,7 +989,7 @@ class Protocol
 
         $command = empty($command) ? '0000' : str_pad($command, 4, ' ', STR_PAD_LEFT);
         /** Next heartbeat packet send interval time */
-        /** gSOAP requires value between 1 and 10 */
+        /** gSOAP nexttime interval in seconds */
         $nextime = empty($command) ? '0005' : str_pad($nexttime, 4, 0, STR_PAD_LEFT);
 
         $length = strlen($content);
