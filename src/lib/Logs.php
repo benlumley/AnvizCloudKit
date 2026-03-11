@@ -29,7 +29,7 @@ class Logs
      */
     public function write($type = 'error', $message = '')
     {
-        if (!$this->debug && ($type != 'error' || $type != 'warning')) {
+        if (!$this->debug && ($type != 'error' && $type != 'warning')) {
             return true;
         }
 
