@@ -35,36 +35,36 @@ class Montitor
     {
 
         if (empty($data)) {
-            $this->log->write('error', 'actionRegister: Receive Data is NULL');
+            $this->log->error('actionRegister: Receive Data is NULL');
             return false;
         }
 
         $result = Protocol::RegisterDevice($data);
 
         if (!$result || empty($result['serial_number'])) {
-            $this->log->write('error', 'actionRegister: Register fail');
+            $this->log->error('actionRegister: Register fail');
             return false;
         }
 
-        $this->log->write('info', 'actionRegister: Device Info:' . json_encode($result));
+        $this->log->debug('actionRegister: Device Info:' . json_encode($result));
 
         $device = $this->callback->register($result);
 
         if (empty($device['id']) || empty($device['token'])) {
-            $this->log->write('error', 'actionRegister: Register fail');
+            $this->log->error('actionRegister: Register fail');
             return false;
         }
 
         $token = $device['token'];
         $id    = $device['id'];
-        $this->log->write('info', 'actionRegister: Register Success!');
-        $this->log->write('info', 'actionRegister: Device Info:' . json_encode($device));
+        $this->log->debug('actionRegister: Register Success!');
+        $this->log->debug('actionRegister: Device Info:' . json_encode($device));
 
         /** Return to let device to login system */
-        $this->log->write('info', 'actionRegister: Device ID:' . $id);
+        $this->log->debug('actionRegister: Device ID:' . $id);
         $command = Protocol::joinCommand($token, $id, '11111111', AnvizConstants::CMD_LOGIN, 60, $id);
 
-        $this->log->write('info', 'actionRegister: Command:', [bin2hex($command)]);
+        $this->log->debug('actionRegister: Command:', [bin2hex($command)]);
         return Tools::R($token . $command);
     }
 
@@ -78,35 +78,35 @@ class Montitor
     public function actionTransport($serial_number = "", $data = "")
     {
         $device_id = $serial_number;
-        $this->log->write('info', 'actionTransport: :' . $device_id);
+        $this->log->debug('actionTransport: :' . $device_id);
 
         if (empty($device_id) || empty($data)) {
-            $this->log->write('error', 'actionTransport: The lack of necessary parameters');
+            $this->log->error('actionTransport: The lack of necessary parameters');
 
             return Protocol::showRegister($device_id);
         }
 
         $token = $this->callback->getToken($device_id);
-        $this->log->write('info', 'actionTransport: Get Token:' . $token);
+        $this->log->debug('actionTransport: Get Token:' . $token);
 
         if (empty($token)) {
-            $this->log->write('error', 'actionTransport: The token has expires');
+            $this->log->error('actionTransport: The token has expires');
             return Protocol::showRegister($device_id);
         }
-        $this->log->write('info', 'pre-get-token');
+        $this->log->debug('pre-get-token');
         $data = Protocol::explodeCommand($token, $data);
-        $this->log->write('info', 'post get token');
+        $this->log->debug('post get token');
         if (!$data) {
-            $this->log->write('error', 'actionTransport: The token has expires');
+            $this->log->error('actionTransport: The token has expires');
 
             return Protocol::showRegister($device_id);
         }
 
         $this->callback->updateLastlogin($device_id);
 
-        $this->log->write('info', 'explodeCommand: Data-'.json_encode($data));
+        $this->log->debug('explodeCommand: Data-'.json_encode($data));
         $command = $data['command'];
-        $this->log->write('info', 'actionTransport: Command:' . AnvizConstants::getCommandName($command));
+        $this->log->debug('actionTransport: Command:' . AnvizConstants::getCommandName($command));
         switch ($data['command']) {
             case AnvizConstants::CMD_REGESTER:
                 return Protocol::showRegister($device_id);
@@ -119,14 +119,14 @@ class Montitor
                 break;
             case AnvizConstants::CMD_GETNETWORK:
                 $result = Protocol::NetworkDevice($data['content']);
-                $this->log->write('info', 'actionTransport: ' . AnvizConstants::CMD_GETNETWORK . ' - ' . json_encode($result));
+                $this->log->debug('actionTransport: ' . AnvizConstants::CMD_GETNETWORK . ' - ' . json_encode($result));
                 if (!$this->callback->network($device_id, $data['id'], $result)) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETNETWORK);
                 }
                 break;
             case AnvizConstants::CMD_GETRECORDUSERFPCOUNT:
                 $result = Protocol::RecordUserFPCountDevice($data['content']);
-                $this->log->write('info', 'actionTransport: ' . AnvizConstants::CMD_GETRECORDUSERFPCOUNT . ' - ' . json_encode($result));
+                $this->log->debug('actionTransport: ' . AnvizConstants::CMD_GETRECORDUSERFPCOUNT . ' - ' . json_encode($result));
                 if (!$this->callback->total($device_id, $data['id'], $result)) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETNETWORK);
                 }
@@ -134,7 +134,7 @@ class Montitor
             case AnvizConstants::CMD_GETALLEMPLOYEE:
             case AnvizConstants::CMD_GETONEEMPLOYEE:
                 $result = Protocol::EmployeeDevice($data['content']);
-                $this->log->write('info', 'actionTransport: ' . AnvizConstants::CMD_GETONEEMPLOYEE . ' - ' . json_encode($result));
+                $this->log->debug('actionTransport: ' . AnvizConstants::CMD_GETONEEMPLOYEE . ' - ' . json_encode($result));
                 if (!$this->callback->employee($device_id, $data['id'], $result)) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLEMPLOYEE);
                 }
@@ -143,10 +143,10 @@ class Montitor
             case AnvizConstants::CMD_GETONEFINGER:
 
                 $dataIsFace = Protocol::dataIsFace($data['content']);
-                $this->log->write('info', 'device is face: ' . intval($dataIsFace));
+                $this->log->debug('device is face: ' . intval($dataIsFace));
                 $result = $dataIsFace ? Protocol::FaceDevice($data['content']) : Protocol::FingerDevice($data['content']);
 
-                $this->log->write('info', 'actionTransport: ' . AnvizConstants::CMD_GETALLFINGER . ' - ' . json_encode($result));
+                $this->log->debug('actionTransport: ' . AnvizConstants::CMD_GETALLFINGER . ' - ' . json_encode($result));
 
                 if ($dataIsFace) {
                     if (!$this->callback->face($device_id, $data['id'], $result)) {
@@ -163,14 +163,14 @@ class Montitor
                 $result = Protocol::dataIsFace($data['content'])?
                     Protocol::EnrollFace($data['content']):Protocol::EnrollFinger($data['content']);
 
-                $this->log->write('info', 'actionTransport: ' . AnvizConstants::CMD_ENROLLFINGER . ' - ' . $result['idd'].' - '.$result['temp_id']);
+                $this->log->debug('actionTransport: ' . AnvizConstants::CMD_ENROLLFINGER . ' - ' . $result['idd'].' - '.$result['temp_id']);
                 if (!$this->callback->enrollFinger($device_id, $data['id'], $result)) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_ENROLLFINGER);
                 }
                 break;
             case AnvizConstants::CMD_ENROLLCARD:
                 $result = Protocol::EnrollCardDevice($data['content']);
-                $this->log->write('info', 'actionTransport: ' . AnvizConstants::CMD_ENROLLCARD . ' - ' . json_encode($result));
+                $this->log->debug('actionTransport: ' . AnvizConstants::CMD_ENROLLCARD . ' - ' . json_encode($result));
                 if (!$this->callback->enrollCard($device_id, $data['id'], $result)) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_ENROLLFINGER);
                 }
@@ -178,7 +178,7 @@ class Montitor
             case AnvizConstants::CMD_GETALLRECORD:
             case AnvizConstants::CMD_GETNEWRECORD:
                 $result = Protocol::RecordDevice($data['content']);
-                $this->log->write('info', 'actionTransport: ' . AnvizConstants::CMD_GETALLRECORD . ' - ' . json_encode($result));
+                $this->log->debug('actionTransport: ' . AnvizConstants::CMD_GETALLRECORD . ' - ' . json_encode($result));
                 if (!$this->callback->record($device_id, $data['id'], $result)) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLRECORD);
                 }
@@ -186,7 +186,7 @@ class Montitor
 
             case AnvizConstants::CMD_GETNEWTEMPRECORD:
                 $result = Protocol::TemperatureRecordDevice($data['content']);
-                $this->log->write('info', 'actionTransport: ' . AnvizConstants::CMD_GETNEWTEMPRECORD . ' - ' . json_encode($result));
+                $this->log->debug('actionTransport: ' . AnvizConstants::CMD_GETNEWTEMPRECORD . ' - ' . json_encode($result));
                 if (!$this->callback->temperatureRecord($device_id, $data['id'], $result)) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETNEWTEMPRECORD);
                 }
@@ -194,21 +194,21 @@ class Montitor
 
             case AnvizConstants::CMD_GETTEMPRECORDPIC:
                 $result = Protocol::TemperaturePic($data['content']);
-                $this->log->write('info', 'actionTransport: ' . AnvizConstants::CMD_GETTEMPRECORDPIC );
+                $this->log->debug('actionTransport: ' . AnvizConstants::CMD_GETTEMPRECORDPIC );
                 if (!$this->callback->temperaturePic($device_id, $data['id'], $result)) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETNEWTEMPRECORD);
                 }
                 break;
 
             case AnvizConstants::CMD_ERROR:
-                $this->log->write('error', 'actionTransport: The command error');
-                $this->log->write('error', 'actionTransport: Data - ' . json_encode($data));
+                $this->log->error('actionTransport: The command error');
+                $this->log->error('actionTransport: Data - ' . json_encode($data));
                 if (!$this->callback->other($device_id, $data['id'])) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_ERROR);
                 }
 
             default:
-                $this->log->info('actionTransport default');
+                $this->log->debug('actionTransport default');
                 if (!$this->callback->other($device_id, $data['id'])) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLRECORD);
                 }
@@ -220,7 +220,7 @@ class Montitor
         if (empty($data)) {
             $command = Protocol::showNocommand($token, $device_id);
         } else {
-            $this->log->write('debug', 'Next Command: Data:' . json_encode($data));
+            $this->log->debug('Next Command: Data:' . json_encode($data));
             $command = Protocol::joinCommand($token, $device_id, $data['id'], $data['command'], 60, $data['content']);
         }
 
@@ -239,32 +239,32 @@ class Montitor
         $device_id = $serial_number;
 
         if (empty($device_id) || empty($data)) {
-            $this->log->write('error', 'actionReport: The lack of necessary parameters');
+            $this->log->error('actionReport: The lack of necessary parameters');
 
             return Protocol::showRegister($device_id);
         }
 
         $token = $this->callback->getToken($device_id);
-        $this->log->write('debug', 'actionReport: Get Token:' . $token);
+        $this->log->debug('actionReport: Get Token:' . $token);
 
         if (empty($token)) {
-            $this->log->write('error', 'actionReport: The token has expires');
+            $this->log->error('actionReport: The token has expires');
             return Protocol::showRegister($device_id);
         }
         $data = Protocol::explodeCommand($token, $data);
         if (!$data) {
-            $this->log->write('error', 'actionReport: No data');
+            $this->log->error('actionReport: No data');
 
             return Protocol::showRegister($device_id);
         }
 
         $this->callback->updateLastlogin($device_id);
 
-        $this->log->info('actionReport: explodeCommand: Data - ', $data);
+        $this->log->debug('actionReport: explodeCommand: Data - ', $data);
         switch ($data['command']) {
             case AnvizConstants::CMD_GETNEWRECORD:
                 $result = Protocol::RecordDevice($data['content']);
-                $this->log->write('debug', 'actionReport: Command - ' . $data['command'] . ', Data - ' . json_encode($result));
+                $this->log->debug('actionReport: Command - ' . $data['command'] . ', Data - ' . json_encode($result));
                 if (!$this->callback->record($device_id, $data['id'], $result)) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLRECORD);
                 }
@@ -272,7 +272,7 @@ class Montitor
 
             case AnvizConstants::CMD_GETNEWTEMPRECORD:
                 $result = Protocol::TemperatureRecordDevice($data['content']);
-                $this->log->write('debug', 'actionReport: Command - ' . $data['command'] . ', Data - ' . json_encode($result));
+                $this->log->debug('actionReport: Command - ' . $data['command'] . ', Data - ' . json_encode($result));
                 if (!$this->callback->temperatureRecord($device_id, $data['id'], $result)) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETNEWTEMPRECORD);
                 }
@@ -280,7 +280,7 @@ class Montitor
 
             case AnvizConstants::CMD_GETTEMPRECORDPIC:
                 $result = Protocol::TemperaturePic($data['content']);
-                $this->log->write('debug', 'actionReport: ' . AnvizConstants::CMD_GETTEMPRECORDPIC );
+                $this->log->debug('actionReport: ' . AnvizConstants::CMD_GETTEMPRECORDPIC );
                 if (!$this->callback->temperaturePic($device_id, $data['id'], $result)) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETNEWTEMPRECORD);
                 }
@@ -292,7 +292,7 @@ class Montitor
 
                 // this is troublesome - i added it; wasn't in cloudkit originally; doesn't reliably decrypt - passwords are always corrupt and sometimes so are names
                 $result = Protocol::EmployeeDevice($data['content']);
-                $this->log->write('info', 'actionReport: ' . $data['command'] . ' - ' . json_encode($result));
+                $this->log->debug('actionReport: ' . $data['command'] . ' - ' . json_encode($result));
                 if (!$this->callback->queueEmployee($device_id, $data['id'], $result)) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLEMPLOYEE);
                 }
@@ -300,24 +300,24 @@ class Montitor
                 break;
 
             default:
-                $this->log->info('actionReport default');
+                $this->log->debug('actionReport default');
                 if (!$this->callback->other($device_id, $data['id'])) {
-                    $this->log->info('actionReport default other');
+                    $this->log->debug('actionReport default other');
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLRECORD);
                 }
-                $this->log->info('actionReport default other end');
+                $this->log->debug('actionReport default other end');
                 break;
         }
 
-        $this->log->info('actionReport: Get Next Command');
+        $this->log->debug('actionReport: Get Next Command');
         /** Get the next command **/
 //        $data = $this->callback->getNextCommand($device_id);
         $data = '';
         if (empty($data)) {
-            $this->log->write('debug', 'actionReport: No next command');
+            $this->log->debug('actionReport: No next command');
             $command = Protocol::showNocommand($token, $device_id);
         } else {
-            $this->log->write('debug', 'actionReport: Response:' . json_encode($data));
+            $this->log->debug('actionReport: Response:' . json_encode($data));
             $command = Protocol::joinCommand($token, $device_id, $data['id'], $data['command'], 60, $data['content']);
         }
 
