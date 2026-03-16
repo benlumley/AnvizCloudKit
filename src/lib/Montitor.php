@@ -218,9 +218,7 @@ class Montitor
         /** Get the next command **/
         $data = $this->callback->getNextCommand($device_id);
         if (empty($data)) {
-            $nexttime = method_exists($this->callback, 'getIdleNexttime')
-                ? $this->callback->getIdleNexttime($device_id)
-                : 60;
+            $nexttime = $this->callback->getIdleNexttime($device_id);
             $command = Protocol::showNocommand($token, $device_id, $nexttime);
         } else {
             $this->log->debug('Next Command: Data:' . json_encode($data));
@@ -319,9 +317,7 @@ class Montitor
         $data = '';
         if (empty($data)) {
             $this->log->debug('actionReport: No next command');
-            $nexttime = method_exists($this->callback, 'getIdleNexttime')
-                ? $this->callback->getIdleNexttime($device_id)
-                : 60;
+            $nexttime = $this->callback->getIdleNexttime($device_id);
             $command = Protocol::showNocommand($token, $device_id, $nexttime);
         } else {
             $this->log->debug('actionReport: Response:' . json_encode($data));
