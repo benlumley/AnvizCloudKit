@@ -1039,24 +1039,24 @@ class Protocol
         return $pack;
     }
 
-    public static function showRegister($device_id)
+    public static function showRegister($device_id, $nexttime = 60)
     {
-        return Tools::R(self::joinCommand('11111111', $device_id, '11111111', AnvizConstants::CMD_REGESTER, 60, ''));
+        return Tools::R(self::joinCommand('11111111', $device_id, '11111111', AnvizConstants::CMD_REGESTER, $nexttime, ''));
     }
 
-    public static function showError($sha1, $device_uuid, $command = '')
+    public static function showError($sha1, $device_uuid, $command = '', $nexttime = 60)
     {
-        return Tools::R(self::joinCommand($sha1, $device_uuid, '11111111', AnvizConstants::CMD_ERROR, 60, $command));
+        return Tools::R(self::joinCommand($sha1, $device_uuid, '11111111', AnvizConstants::CMD_ERROR, $nexttime, $command));
     }
 
-    public static function showForbidden()
+    public static function showForbidden($nexttime = 60)
     {
-        return Tools::R(self::joinCommand('11111111', '22222222', '22222222', AnvizConstants::CMD_FORBIDDEN, 60, ''));
+        return Tools::R(self::joinCommand('11111111', '22222222', '22222222', AnvizConstants::CMD_FORBIDDEN, $nexttime, ''));
     }
 
-    public static function showNocommand($token, $device_id)
+    public static function showNocommand($token, $device_id, $nexttime = 60)
     {
-        return Protocol::joinCommand($token, $device_id, '11111111', AnvizConstants::CMD_NOCOMMAND, 60);
+        return Protocol::joinCommand($token, $device_id, '11111111', AnvizConstants::CMD_NOCOMMAND, $nexttime);
     }
 
     /**

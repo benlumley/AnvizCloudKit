@@ -157,8 +157,17 @@ interface AnvizCallbackInterface
      * @description Each time the device communicates with the server, this method is called to return the instructions that the device needs to execute.
      *              If return null, the device will execute next heartbeat after 5seconds.
      *              Instructions in the package method see the following AnvizCommand class method
+     *              Return array may include 'nexttime' => int (seconds). If omitted, library uses default of 1.
      * @param
      *      id: string Device id
      */
     public function getNextCommand($id);
+
+    /**
+     * Get the idle heartbeat interval for a device (no pending commands).
+     *
+     * @param string $id Device ID
+     * @return int Seconds until next heartbeat (e.g. 10 or 60)
+     */
+    public function getIdleNexttime($id): int;
 }

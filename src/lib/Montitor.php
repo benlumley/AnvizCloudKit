@@ -62,7 +62,7 @@ class Montitor
 
         /** Return to let device to login system */
         $this->log->debug('actionRegister: Device ID:' . $id);
-        $command = Protocol::joinCommand($token, $id, '11111111', AnvizConstants::CMD_LOGIN, 60, $id);
+        $command = Protocol::joinCommand($token, $id, '11111111', AnvizConstants::CMD_LOGIN, 1, $id);
 
         $this->log->debug('actionRegister: Command:', [bin2hex($command)]);
         return Tools::R($token . $command);
@@ -227,10 +227,12 @@ class Montitor
         /** Get the next command **/
         $data = $this->callback->getNextCommand($device_id);
         if (empty($data)) {
-            $command = Protocol::showNocommand($token, $device_id);
+            $nexttime = $this->callback->getIdleNexttime($device_id);
+            $command = Protocol::showNocommand($token, $device_id, $nexttime);
         } else {
             $this->log->debug('Next Command: Data:' . json_encode($data));
-            $command = Protocol::joinCommand($token, $device_id, $data['id'], $data['command'], 60, $data['content']);
+            $nexttime = $data['nexttime'] ?? 1;
+            $command = Protocol::joinCommand($token, $device_id, $data['id'], $data['command'], $nexttime, $data['content']);
         }
 
         return Tools::R($command);
@@ -320,10 +322,12 @@ class Montitor
         $data = '';
         if (empty($data)) {
             $this->log->debug('actionReport: No next command');
-            $command = Protocol::showNocommand($token, $device_id);
+            $nexttime = $this->callback->getIdleNexttime($device_id);
+            $command = Protocol::showNocommand($token, $device_id, $nexttime);
         } else {
             $this->log->debug('actionReport: Response:' . json_encode($data));
-            $command = Protocol::joinCommand($token, $device_id, $data['id'], $data['command'], 60, $data['content']);
+            $nexttime = $data['nexttime'] ?? 1;
+            $command = Protocol::joinCommand($token, $device_id, $data['id'], $data['command'], $nexttime, $data['content']);
         }
 
         return Tools::R($command);
