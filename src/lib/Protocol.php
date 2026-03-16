@@ -661,8 +661,9 @@ class Protocol
             // treat as "no password" rather than silently encoding garbage
             $pack .= substr(pack('N', 0xFF), 0, 3);
         } else {
+            $passlen = strlen($passd);
             $passd = intval($passd);
-            $length = strlen((string) $passd) << 4;
+            $length = $passlen << 4;
             $length = intval($length) + intval($passd >> 16);
             $pack .= substr(pack('n', $length), 1, 1) . substr(pack('N', $passd), 2, 2);
         }
