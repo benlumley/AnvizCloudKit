@@ -218,11 +218,13 @@ class Montitor
         /** Get the next command **/
         $data = $this->callback->getNextCommand($device_id);
         if (empty($data)) {
-            $nexttime = $this->callback->getIdleNexttime($device_id);
+            $nexttime = method_exists($this->callback, 'getIdleNexttime')
+                ? $this->callback->getIdleNexttime($device_id)
+                : 60;
             $command = Protocol::showNocommand($token, $device_id, $nexttime);
         } else {
             $this->log->debug('Next Command: Data:' . json_encode($data));
-            $nexttime = $data['nexttime'] ?? 1;
+            $nexttime = $data['nexttime'] ?? 60;
             $command = Protocol::joinCommand($token, $device_id, $data['id'], $data['command'], $nexttime, $data['content']);
         }
 
@@ -317,11 +319,13 @@ class Montitor
         $data = '';
         if (empty($data)) {
             $this->log->debug('actionReport: No next command');
-            $nexttime = $this->callback->getIdleNexttime($device_id);
+            $nexttime = method_exists($this->callback, 'getIdleNexttime')
+                ? $this->callback->getIdleNexttime($device_id)
+                : 60;
             $command = Protocol::showNocommand($token, $device_id, $nexttime);
         } else {
             $this->log->debug('actionReport: Response:' . json_encode($data));
-            $nexttime = $data['nexttime'] ?? 1;
+            $nexttime = $data['nexttime'] ?? 60;
             $command = Protocol::joinCommand($token, $device_id, $data['id'], $data['command'], $nexttime, $data['content']);
         }
 
