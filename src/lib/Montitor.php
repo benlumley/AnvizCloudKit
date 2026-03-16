@@ -222,7 +222,7 @@ class Montitor
             $command = Protocol::showNocommand($token, $device_id, $nexttime);
         } else {
             $this->log->debug('Next Command: Data:' . json_encode($data));
-            $nexttime = $data['nexttime'] ?? 60;
+            $nexttime = $data['nexttime'] ?? 1;
             $command = Protocol::joinCommand($token, $device_id, $data['id'], $data['command'], $nexttime, $data['content']);
         }
 
@@ -321,7 +321,7 @@ class Montitor
             $command = Protocol::showNocommand($token, $device_id, $nexttime);
         } else {
             $this->log->debug('actionReport: Response:' . json_encode($data));
-            $nexttime = $data['nexttime'] ?? 60;
+            $nexttime = $data['nexttime'] ?? 1;
             $command = Protocol::joinCommand($token, $device_id, $data['id'], $data['command'], $nexttime, $data['content']);
         }
 
