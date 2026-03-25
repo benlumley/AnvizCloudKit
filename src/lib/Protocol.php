@@ -300,14 +300,21 @@ class Protocol
 
             $record['name'] = empty($name) ? (string) $record['idd'] : $name;
 
-            // Best-effort password — may be corrupt from firmware encoding mismatch
+            // Password: firmware bug in formatDataToCloud writes bytes as
+            // [LOW, HIGH, MID] instead of standard [HIGH, MID, LOW].
+            // See docs/anviz-firmware/findings/FW-001-password-byte-rotation.md
             if (ord($row[5]) == 0xFF && ord($row[6]) == 0xFF && ord($row[7]) == 0xFF) {
                 $record['passd'] = '';
             } else {
-                // Raw 3-byte big-endian value (firmware does NOT use the packed
-                // length-nibble format that the cloud protocol uses)
-                $raw = (ord($row[5]) << 16) + (ord($row[6]) << 8) + ord($row[7]);
-                $record['passd'] = (string) $raw;
+                // Bytes arrive rotated: [LOW, HIGH, MID] from formatDataToCloud bug.
+                // HIGH byte has password length in upper nibble + value bits 19-16.
+                // MID byte has value bits 15-8. LOW byte has value bits 7-0.
+                $low  = ord($row[5]);
+                $high = ord($row[6]);
+                $mid  = ord($row[7]);
+                $passlen = $high >> 4;
+                $passval = (($high & 0x0F) << 16) | ($mid << 8) | $low;
+                $record['passd'] = str_pad((string) $passval, $passlen, '0', STR_PAD_LEFT);
             }
 
             // Card number
