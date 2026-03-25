@@ -202,7 +202,7 @@ class Montitor
 
             case AnvizConstants::CMD_PUTONEEMPLOYEE:
             case AnvizConstants::CMD_PUTALLEMPLOYEE:
-                $result = Protocol::EmployeeDeviceRaw($data['content']);
+                $result = Protocol::EmployeeDeviceReport($data['content']);
                 $this->log->debug('actionTransport: ' . $data['command'] . ' - ' . json_encode($result));
                 if (!$this->callback->queueEmployee($device_id, $data['id'], $result ?: [])) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLEMPLOYEE);
@@ -299,7 +299,7 @@ class Montitor
 
             case AnvizConstants::CMD_PUTONEEMPLOYEE:
             case AnvizConstants::CMD_PUTALLEMPLOYEE:
-                $result = Protocol::EmployeeDeviceRaw($data['content']);
+                $result = Protocol::EmployeeDeviceReport($data['content']);
                 $this->log->debug('actionReport: ' . $data['command'] . ' - ' . json_encode($result));
                 if (!$this->callback->queueEmployee($device_id, $data['id'], $result ?: [])) {
                     return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETALLEMPLOYEE);

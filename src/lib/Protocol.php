@@ -235,22 +235,22 @@ class Protocol
     }
 
     /**
-     * Parse employee data pushed FROM the device (CMD_PUTONEEMPLOYEE / CMD_PUTALLEMPLOYEE).
+     * Parse employee data pushed FROM the device via actionReport
+     * (CMD_PUTONEEMPLOYEE / CMD_PUTALLEMPLOYEE).
      *
-     * The firmware's CC_GetNewUser packs records differently from the cloud
-     * protocol used by DB_User::getUserAll (which EmployeeDevice expects):
-     *  - Password bytes are raw 3-byte big-endian values (no length nibble).
-     *  - Name field may contain UTF-8 bytes instead of UTF-16LE code-units.
+     * This handles data from the firmware's formatDataToCloud function
+     * (Dlg_UserEdit / Dlg_UserRegUser), which has two known differences
+     * from the standard EmployeeDevice format used by CMD_GET* responses:
      *
-     * Because the data is unreliable, this method extracts only the IDD
-     * (which is always correctly encoded) and logs the raw hex for debugging.
-     * Callers should use the IDD to queue a person/findSingle task to
-     * re-fetch authoritative data from the device.
+     *  - Password bytes are rotated: [LOW, HIGH, MID] instead of [HIGH, MID, LOW].
+     *    This is a firmware bug in formatDataToCloud (see FW-001).
+     *  - Name field may contain UTF-8 bytes instead of UTF-16LE code-units,
+     *    so we try UTF-16LE first then fall back to UTF-8.
      *
      * @param string $content
      * @return array|bool
      */
-    public static function EmployeeDeviceRaw($content = '')
+    public static function EmployeeDeviceReport($content = '')
     {
         if (empty($content)) {
             return false;
@@ -326,6 +326,12 @@ class Protocol
 
             // Group ID
             $record['group_id'] = ord($row[33]);
+
+            // Finger/face registration sign
+            $record['fingersign'] = (ord($row[35]) << 8) + ord($row[36]);
+
+            // Admin flag
+            $record['is_admin'] = ord($row[37]);
 
             $result[$i] = $record;
         }
