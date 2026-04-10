@@ -184,6 +184,19 @@ class Montitor
                 }
                 break;
 
+            case AnvizConstants::CMD_GETRECORDFROMTIME:
+                // FW-002: Response may use 11-byte records (modfill-encoded) or 16-byte raw records.
+                // Try 11-byte first, fall back to 16-byte if parsing fails.
+                $result = Protocol::RecordDeviceFromTime($data['content']);
+                if ($result === false) {
+                    $result = Protocol::RecordDevice($data['content']);
+                }
+                $this->log->debug('actionTransport: ' . AnvizConstants::CMD_GETRECORDFROMTIME . ' - ' . json_encode($result));
+                if (!$this->callback->record($device_id, $data['id'], $result)) {
+                    return Protocol::showError($token, $device_id, AnvizConstants::CMD_GETRECORDFROMTIME);
+                }
+                break;
+
             case AnvizConstants::CMD_GETNEWTEMPRECORD:
                 $result = Protocol::TemperatureRecordDevice($data['content']);
                 $this->log->debug('actionTransport: ' . AnvizConstants::CMD_GETNEWTEMPRECORD . ' - ' . json_encode($result));

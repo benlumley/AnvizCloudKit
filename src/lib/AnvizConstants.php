@@ -40,6 +40,7 @@ class AnvizConstants
     // Attendance Records
     public const CMD_GETALLRECORD = 3001;               // Download all attendance records
     public const CMD_GETNEWRECORD = 3002;               // Download new attendance records
+    public const CMD_GETRECORDFROMTIME = 3004;           // Download records filtered by time range and/or person (FW-002)
 
     // Temperature Records
     public const CMD_GETNEWTEMPRECORD = 3005;           // Download new temperature records

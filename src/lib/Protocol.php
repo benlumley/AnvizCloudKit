@@ -566,6 +566,49 @@ class Protocol
     }
 
     /**
+     * Parse attendance records from CMD_GETRECORDFROMTIME (3004) response.
+     *
+     * FW-002: The firmware packs each record as 11 bytes via bufToModFillByte.
+     * Fields: 5-byte idd + 4-byte checktime + 1-byte checktype + 1-byte worktype.
+     * Returns the same array structure as RecordDevice() for callback compatibility.
+     *
+     * @param  string  $content  Raw decrypted content from explodeCommand
+     * @return array|false  Array of records, or false if content doesn't parse as 11-byte records
+     */
+    public static function RecordDeviceFromTime($content = '')
+    {
+        if (empty($content)) {
+            return false;
+        }
+
+        if (strlen($content) % 11 != 0) {
+            return false;
+        }
+
+        $result = array();
+        $count = strlen($content) / 11;
+        for ($i = 0; $i < $count; $i++) {
+            $row = substr($content, $i * 11, 11);
+
+            $record = array();
+
+            /** ID On Device */
+            $record['idd'] = (ord($row[0]) << 32) + (ord($row[1]) << 24) + (ord($row[2]) << 16) + (ord($row[3]) << 8) + ord($row[4]);
+            /** Check Time */
+            $record['checktime'] = (ord($row[5]) << 24) + (ord($row[6]) << 16) + (ord($row[7]) << 8) + ord($row[8]);
+            $record['checktime'] = $record['checktime'] + strtotime('2000-01-02 00:00:00');
+            /** Check Type */
+            $record['checktype'] = ord($row[9]);
+            /** Work Type */
+            $record['worktype'] = ord($row[10]);
+
+            $result[$i] = $record;
+        }
+
+        return $result;
+    }
+
+    /**
      * @Created    by Jacobs <jacobs@anviz.com>
      * @Name       : TemperatureRecordDevice
      *
@@ -950,6 +993,60 @@ class Protocol
         $pack = '';
         $pack .= str_pad($start, 8, '0', STR_PAD_LEFT);
         $pack .= str_pad($limit, 8, '0', STR_PAD_LEFT);
+
+        return $pack;
+    }
+
+    /**
+     * Build the payload for CMD_GETRECORDFROMTIME (3004).
+     *
+     * Firmware handler: CC_GetReocrdFromTime (FW-002).
+     * Payload: 5-byte person_id (big-endian idd, 0xFF×5 = all)
+     *        + 4-byte start_time (big-endian uint32, seconds since Anviz epoch, 0xFF×4 = no filter)
+     *        + 4-byte end_time   (same format)
+     *
+     * Anviz epoch: 2000-01-02 00:00:00 UTC.
+     *
+     * @param  array{person_id?: int|null, start_time?: int|null, end_time?: int|null}  $data
+     * @return string  13-byte binary payload
+     */
+    public static function getRecordFromTime(array $data): string
+    {
+        $epoch = strtotime('2000-01-02 00:00:00');
+
+        // Person ID: 5-byte big-endian, or 0xFF×5 for "all"
+        if (isset($data['person_id']) && $data['person_id'] !== null) {
+            $id = (int) $data['person_id'];
+            $pack = chr(($id >> 32) & 0xFF)
+                  . chr(($id >> 24) & 0xFF)
+                  . chr(($id >> 16) & 0xFF)
+                  . chr(($id >> 8) & 0xFF)
+                  . chr($id & 0xFF);
+        } else {
+            $pack = str_repeat("\xFF", 5);
+        }
+
+        // Start time: 4-byte big-endian seconds since epoch, or 0xFF×4
+        if (isset($data['start_time']) && $data['start_time'] !== null) {
+            $seconds = (int) $data['start_time'] - $epoch;
+            $pack .= chr(($seconds >> 24) & 0xFF)
+                   . chr(($seconds >> 16) & 0xFF)
+                   . chr(($seconds >> 8) & 0xFF)
+                   . chr($seconds & 0xFF);
+        } else {
+            $pack .= str_repeat("\xFF", 4);
+        }
+
+        // End time: same format
+        if (isset($data['end_time']) && $data['end_time'] !== null) {
+            $seconds = (int) $data['end_time'] - $epoch;
+            $pack .= chr(($seconds >> 24) & 0xFF)
+                   . chr(($seconds >> 16) & 0xFF)
+                   . chr(($seconds >> 8) & 0xFF)
+                   . chr($seconds & 0xFF);
+        } else {
+            $pack .= str_repeat("\xFF", 4);
+        }
 
         return $pack;
     }
