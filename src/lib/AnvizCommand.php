@@ -708,6 +708,35 @@ class AnvizCommand
         );
     }
 
+    /**
+     * Get attendance records filtered by time range and/or person ID.
+     *
+     * Uses undocumented command 3004 (CC_GetReocrdFromTime). See FW-002.
+     *
+     * @param  int|null  $personId   Employee ID on device (idd), or null for all
+     * @param  int|null  $startTime  Unix timestamp for start of range, or null for no filter
+     * @param  int|null  $endTime    Unix timestamp for end of range, or null for no filter
+     * @return array{id: string, params: array, command: int, content: string}
+     */
+    public function getRecordsFromTime(?int $personId = null, ?int $startTime = null, ?int $endTime = null): array
+    {
+        $data = [
+            'person_id' => $personId,
+            'start_time' => $startTime,
+            'end_time' => $endTime,
+        ];
+
+        $content = Protocol::getRecordFromTime($data);
+        $id = Tools::createCommandId();
+
+        return [
+            'id' => $id,
+            'params' => $data,
+            'command' => AnvizConstants::CMD_GETRECORDFROMTIME,
+            'content' => base64_encode($content),
+        ];
+    }
+
     public function opendoor()
     {
         $data  = array();
